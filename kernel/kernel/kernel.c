@@ -7,6 +7,6 @@ kernel_main(void)
   terminal_initialize();
   for(int i = 0; i < 10000; ++i)
   {
-    printf("%d\n", i);
+    printf("%x\n", i);
   }
 }

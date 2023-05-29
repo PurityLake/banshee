@@ -11,9 +11,18 @@ itoa(int n, char *buffer, int radix)
 
   char reverse[50];
 
-  for(size_t i = 0; i < 50; ++i)
+  int i;
+  for(i = 0; i < 50; ++i)
   {
-    reverse[i] = '0' + (n % radix);
+    size_t val = n % radix;
+    if(val > 9)
+    {
+      reverse[i] = 'A' + (val - 10);
+    }
+    else
+    {
+      reverse[i] = '0' + val;
+    }
     n /= radix;
     if(n == 0)
     {
@@ -22,9 +31,7 @@ itoa(int n, char *buffer, int radix)
     }
   }
 
-  int i = strlen(reverse) - 1;
-  size_t j = 0;
-  for(; i >= 0; --i, ++j)
+  for(size_t j = 0; i >= 0; --i, ++j)
   {
     buffer[j] = reverse[i];
     if(i == 0)

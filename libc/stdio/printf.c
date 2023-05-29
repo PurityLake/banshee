@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __is_libk
 #include <kernel/tty.h>
@@ -40,6 +41,30 @@ printf(const char *format, ...)
         char buffer[50];
         itoa(number, buffer, 10);
         puts(buffer);
+      }
+      else if(*c == 'x' || *c == 'X')
+      {
+        int number = va_arg(argp, int);
+        char buffer[50];
+        itoa(number, buffer, 16);
+        if(*c == 'X')
+        {
+          puts(buffer);
+        }
+        else
+        {
+          for(size_t i = 0; i < strlen(buffer); ++i)
+          {
+            if(buffer[i] > '9')
+            {
+              putchar('a' + (buffer[i] - 'A'));
+            }
+            else
+            {
+              putchar(buffer[i]);
+            }
+          }
+        }
       }
     }
     else
