@@ -18,6 +18,9 @@ extern "C"
   void *memset(void *ptr, int value, size_t len);
   void *memmove(void *dest, const void *src, size_t len);
 
+  char *strcpy(char *dest, const char *src);
+  char *strcat(char *dest, const char *src);
+
 #ifdef __cplusplus
 }
 #endif

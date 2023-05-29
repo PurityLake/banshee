@@ -2,7 +2,7 @@
 #include <string.h>
 
 char *
-itoa(int n, char *buffer, int radix)
+utoa(unsigned int n, char *buffer, int radix)
 {
   if(radix < 2)
   {
@@ -10,9 +10,6 @@ itoa(int n, char *buffer, int radix)
   }
 
   char reverse[50];
-  int sign = (n < 0) ? -1 : 0;
-
-  n = (n < 0) ? -n : n;
 
   int i;
   for(i = 0; i < 50; ++i)
@@ -34,21 +31,12 @@ itoa(int n, char *buffer, int radix)
     }
   }
 
-  for(int j = sign; i >= 0; --i, ++j)
+  for(size_t j = 0; i >= 0; --i, ++j)
   {
-    if(j < 0)
+    buffer[j] = reverse[i];
+    if(i == 0)
     {
-      j = 0;
-      buffer[j] = '-';
-      ++i;
-    }
-    else
-    {
-      buffer[j] = reverse[i];
-      if(i == 0)
-      {
-        buffer[j + 1] = '\0';
-      }
+      buffer[j + 1] = '\0';
     }
   }
 

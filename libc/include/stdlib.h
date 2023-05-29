@@ -9,6 +9,9 @@ extern "C"
   __attribute__((__noreturn__)) void abort(void);
 
   char *itoa(int n, char *buffer, int radix);
+  char *utoa(unsigned int n, char *buffer, int radix);
+  char *ftoa(float f, char *buffer, int after);
+  char *dtoa(double d, char *buffer, int after);
 
 #ifdef __cplusplus
 }

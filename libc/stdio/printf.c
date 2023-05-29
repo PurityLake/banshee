@@ -8,6 +8,9 @@
 #error "libc is not ready yet"
 #endif
 
+// TODO: Add scientific notation
+// TODO: Add flags, width, length and precision
+
 int
 printf(const char *format, ...)
 {
@@ -25,6 +28,10 @@ printf(const char *format, ...)
       {
         putchar('%');
       }
+      else if(*c == 'n')
+      {
+        // do nothing
+      }
       else if(*c == 'c')
       {
         char to_print = va_arg(argp, int);
@@ -35,18 +42,47 @@ printf(const char *format, ...)
         char *s = va_arg(argp, char *);
         puts(s);
       }
-      else if(*c == 'd')
+      else if(*c == 'p')
       {
-        int number = va_arg(argp, int);
+        uintptr_t addr = va_arg(argp, uintptr_t);
+        if(sizeof(addr) > sizeof(int))
+        {
+          puts("\nNotSupported\n");
+        }
+        else
+        {
+          char buffer[50];
+          utoa(addr, buffer, 16);
+          puts("0x");
+          puts(buffer);
+        }
+      }
+      else if(*c == 'd' || *c == 'i')
+      {
+        int number = va_arg(argp, double);
         char buffer[50];
         itoa(number, buffer, 10);
         puts(buffer);
       }
+      else if(*c == 'f')
+      {
+        double number = va_arg(argp, double);
+        char buffer[50];
+        dtoa(number, buffer, 5);
+        puts(buffer);
+      }
+      else if(*c == 'u')
+      {
+        unsigned int number = va_arg(argp, unsigned int);
+        char buffer[50];
+        utoa(number, buffer, 10);
+        puts(buffer);
+      }
       else if(*c == 'x' || *c == 'X')
       {
-        int number = va_arg(argp, int);
+        unsigned int number = va_arg(argp, unsigned int);
         char buffer[50];
-        itoa(number, buffer, 16);
+        utoa(number, buffer, 16);
         if(*c == 'X')
         {
           puts(buffer);
@@ -65,6 +101,13 @@ printf(const char *format, ...)
             }
           }
         }
+      }
+      else if(*c == 'o')
+      {
+        int number = va_arg(argp, int);
+        char buffer[50];
+        itoa(number, buffer, 8);
+        puts(buffer);
       }
     }
     else
