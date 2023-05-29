@@ -29,15 +29,11 @@ LIBK_CPPFLAGS:=$(LIBK_CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
 
 FREEOBJS=\
 $(ARCH_FREEOBJS) \
-stdio/printf.o \
-stdio/putchar.o \
-stdio/puts.o \
-stdlib/abort.o \
+string/strlen.o \
 string/memcmp.o \
 string/memcpy.o \
-string/memmove.o \
 string/memset.o \
-string/strlen.o \
+string/memmove.o
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
@@ -54,7 +50,7 @@ BINARIES=libk.a
 .PHONY: all clean install install-headers install-libs
 .SUFFIXES: .o .libk.o .c .S
 
-all: $(BINARIES)
+all:
 
 libc.a: $(OBJS)
 	$(AR) rcs $@ $(OBJS)

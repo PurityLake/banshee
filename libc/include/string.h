@@ -1,22 +1,27 @@
-#ifndef _STRING_H
-#define _STRING_H 1
+#ifndef __H_BANSHEE_STRING__
+#define __H_BANSHEE_STRING__
 
-#include <sys/cdefs.h>
+#include <banshee/cdefs.h>
 
 #include <stddef.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-int memcmp(const void*, const void*, size_t);
-void* memcpy(void* __restrict, const void* __restrict, size_t);
-void* memmove(void*, const void*, size_t);
-void* memset(void*, int, size_t);
-size_t strlen(const char*);
+  size_t strlen(const char *str);
+
+  int memcmp(const void *ptr1, const void *ptr2, size_t num);
+
+  void *memcpy(void *dest, const void *src, size_t num);
+
+  void *memset(void *ptr, int value, size_t num);
+
+  void *memmove(void *dest, const void *src, size_t num);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* __H_BANSHEE_STRING__ */

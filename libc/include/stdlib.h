@@ -1,17 +1,15 @@
-#ifndef _STDLIB_H
-#define _STDLIB_H 1
-
-#include <sys/cdefs.h>
+#ifndef __H_BANSHEE_STDLIB__
+#define __H_BANSHEE_STDLIB__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-__attribute__((__noreturn__))
-void abort(void);
+  __attribute__((__noreturn__)) void abort(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* __H_BANSHEE_STDLIB__ */
