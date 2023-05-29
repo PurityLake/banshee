@@ -4,5 +4,9 @@ void
 kernel_main(void)
 {
   terminal_initialize();
-  terminal_writestring("Hello World!");
+  for(int i = 0; i < 100; ++i)
+  {
+    terminal_putchar('A' + i);
+    terminal_putchar('\n');
+  }
 }
