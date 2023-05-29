@@ -53,18 +53,16 @@ terminal_scroll()
   {
     for(size_t x = 0; x < VGA_WIDTH; ++x)
     {
-      if(y + 1 == VGA_HEIGHT)
-      {
-        const size_t index = y * VGA_WIDTH + x;
-        terminal_buffer[index] = vga_entry(' ', terminal_color);
-      }
-      else
-      {
-        const size_t index1 = (y - 1) * VGA_WIDTH + x;
-        const size_t index2 = y * VGA_WIDTH + x;
-        terminal_buffer[index1] = terminal_buffer[index2];
-      }
+      const size_t index1 = (y - 1) * VGA_WIDTH + x;
+      const size_t index2 = y * VGA_WIDTH + x;
+      terminal_buffer[index1] = terminal_buffer[index2];
     }
+  }
+
+  size_t y = VGA_WIDTH * (VGA_HEIGHT - 1);
+  for(size_t x = 0; x < VGA_WIDTH; ++x)
+  {
+    terminal_buffer[y + x] = vga_entry(' ', terminal_color);
   }
 }
 
