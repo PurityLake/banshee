@@ -1,19 +1,39 @@
 #include <string.h>
 
 int
-memcmp(const void *ptr1, const void *ptr2, size_t num)
+memcmp(const void *ptr1, const void *ptr2, size_t len)
 {
-  const unsigned char *cptr1 = (const unsigned char *)ptr1;
-  const unsigned char *cptr2 = (const unsigned char *)ptr2;
-  for(size_t i = 0; i < num; ++i)
+  if((uintptr_t)ptr1 % sizeof(long) == 0 && (uintptr_t)ptr2 % sizeof(long) == 0
+     && len % sizeof(long) == 0)
   {
-    if(cptr1[i] > cptr2[i])
+    const long *lptr1 = (const long *)ptr1;
+    const long *lptr2 = (const long *)ptr2;
+    for(size_t i = 0; i < len / sizeof(long); ++i)
     {
-      return 1;
+      if(lptr1[i] > lptr2[i])
+      {
+        return 1;
+      }
+      else if(lptr1[i] < lptr2[i])
+      {
+        return -1;
+      }
     }
-    else if(cptr1[i] < cptr2[i])
+  }
+  else
+  {
+    const char *cptr1 = (const char *)ptr1;
+    const char *cptr2 = (const char *)ptr2;
+    for(size_t i = 0; i < len; ++i)
     {
-      return -1;
+      if(cptr1[i] > cptr2[i])
+      {
+        return 1;
+      }
+      else if(cptr1[i] < cptr2[i])
+      {
+        return -1;
+      }
     }
   }
   return 0;

@@ -4,6 +4,7 @@
 #include <banshee/cdefs.h>
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -12,13 +13,10 @@ extern "C"
 
   size_t strlen(const char *str);
 
-  int memcmp(const void *ptr1, const void *ptr2, size_t num);
-
-  void *memcpy(void *dest, const void *src, size_t num);
-
-  void *memset(void *ptr, int value, size_t num);
-
-  void *memmove(void *dest, const void *src, size_t num);
+  int memcmp(const void *ptr1, const void *ptr2, size_t len);
+  void *memcpy(void *dest, const void *src, size_t len);
+  void *memset(void *ptr, int value, size_t len);
+  void *memmove(void *dest, const void *src, size_t len);
 
 #ifdef __cplusplus
 }

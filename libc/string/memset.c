@@ -7,7 +7,7 @@ memset(void *ptr, int value, size_t num)
 
   for(size_t i = 0; i < num; ++i)
   {
-    *cptr++ = (unsigned char)value;
+    *cptr++ = value;
   }
 
   return ptr;
