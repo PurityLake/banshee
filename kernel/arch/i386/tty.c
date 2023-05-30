@@ -114,3 +114,12 @@ terminal_writestring(const char *data)
 {
   terminal_write(data, strlen(data));
 }
+
+void
+terminal_writeerror(const char *data)
+{
+  uint8_t prev_color = terminal_color;
+  terminal_color = vga_entry_color(VGA_COLOR_RED, VGA_COLOR_BLACK);
+  terminal_writestring(data);
+  terminal_color = prev_color;
+}

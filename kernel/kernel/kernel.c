@@ -8,6 +8,8 @@ kernel_main(void)
 {
   terminal_initialize();
 
+  terminal_writeerror("TEST ERROR\n");
+
   puts("Initialize Serial I/O\n");
   if(serial_init() == 0)
   {
@@ -23,6 +25,6 @@ kernel_main(void)
   }
   else
   {
-    puts("Failed To Initialize Serial I/O\n");
+    terminal_writeerror("Failed To Initialize Serial I/O\n");
   }
 }
