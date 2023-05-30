@@ -25,7 +25,7 @@ extern "C"
 #endif
 
   static inline unsigned char
-  inb(uint16_t port)
+  port_inb(uint16_t port)
   {
     unsigned char result;
     asm volatile("in %%dx, %%al" : "=a"(result) : "d"(port));
@@ -33,7 +33,7 @@ extern "C"
   }
 
   static inline void
-  outb(uint16_t port, unsigned char data)
+  port_outb(uint16_t port, unsigned char data)
   {
     asm volatile("out %%al, %%dx" : : "a"(data), "d"(port));
   }
