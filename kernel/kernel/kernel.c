@@ -24,7 +24,7 @@ kernel_main(void)
 {
   terminal_initialize();
 
-  if(serial_init() == 0)
+  if(serial_init(SERIAL_PORT1) == 0)
   {
     puts("Attempint to intialize Serial I/O\n");
     puts("Finished intializing Serial I/O\n");
@@ -34,7 +34,7 @@ kernel_main(void)
 
     for(size_t i = 0; i < len; ++i)
     {
-      serial_write(message[i]);
+      serial_write(SERIAL_PORT1, message[i]);
     }
   }
   else

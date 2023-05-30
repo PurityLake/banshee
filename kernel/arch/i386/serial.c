@@ -19,56 +19,72 @@
 
 // TODO: Add interrupts at a later time
 
-int
-serial_init(void)
+enum uart_register_names
 {
-  outb(SERIAL_PORT + 1, 0x00);
-  outb(SERIAL_PORT + 3, 0x80);
-  outb(SERIAL_PORT + 0, 0x03);
-  outb(SERIAL_PORT + 1, 0x00);
-  outb(SERIAL_PORT + 3, 0x03);
-  outb(SERIAL_PORT + 2, 0x07);
-  outb(SERIAL_PORT + 4, 0x13);
-  outb(SERIAL_PORT + 0, 0xAE);
+  THR_WRITE = 0, /* Transmitter Holder Buffer */
+  PBR_READ = 0,  /* Reciever Buffer */
+  DLL_RW = 0,    /* Divsor Latch Low Byte */
+  IER_RW = 1,    /* Interrupt Enable Register */
+  DLH_RW = 1,    /* Divsor Latch High Byte */
+  IIR_READ = 2,  /* Interrupt Identification Register */
+  FCR_WRITE = 2, /* FIFO Control Register */
+  LCR_RW = 3,    /* Line Control Register */
+  MCR_RW = 4,    /* Modem Control Register */
+  LSR_READ = 5,  /* Line Status Register */
+  MSR_READ = 6,  /* Modem Status Register */
+  SR_RW = 7,     /* Scratch Register */
+};
+
+int
+serial_init(uint16_t device)
+{
+  port_outb(device + IER_RW, 0x00);
+  port_outb(device + LCR_RW, 0x80);
+  port_outb(device + DLL_RW, 0x03);
+  port_outb(device + DLH_RW, 0x00);
+  port_outb(device + LCR_RW, 0x03);
+  port_outb(device + FCR_WRITE, 0x07);
+  port_outb(device + MCR_RW, 0x13);
+  port_outb(device + THR_WRITE, 0xAE);
 
   /* Check if serial if faulty (i.e: not same byte as sent) */
-  if(inb(SERIAL_PORT + 0) != 0xAE)
+  if(port_inb(device + PBR_READ) != 0xAE)
   {
     return 1;
   }
 
   /* If serial is not faulty set it in normal operation mode
    * (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled) */
-  outb(SERIAL_PORT + 4, 0x0F);
+  port_outb(device + MCR_RW, 0x0F);
   return 0;
 }
 
-static int
-serial_recevied(void)
+static inline int
+serial_recevied(uint16_t device)
 {
-  return inb(SERIAL_PORT + 5) & 1;
+  return port_inb(device + LSR_READ) & 1;
 }
 
-char
-serial_read(void)
+unsigned char
+serial_read(uint16_t device)
 {
-  while(serial_recevied() == 0)
+  while(serial_recevied(device) == 0)
     ;
 
-  return inb(SERIAL_PORT);
+  return port_inb(device + PBR_READ);
 }
 
-static int
-is_transmit_empty(void)
+static inline int
+is_transmit_empty(uint16_t device)
 {
-  return inb(SERIAL_PORT + 5) & 0x20;
+  return port_inb(device + LSR_READ) & 0x20;
 }
 
 void
-serial_write(char a)
+serial_write(uint16_t device, unsigned char data)
 {
-  while(is_transmit_empty() == 0)
+  while(is_transmit_empty(device) == 0)
     ;
 
-  outb(SERIAL_PORT, a);
+  port_outb(device + THR_WRITE, data);
 }

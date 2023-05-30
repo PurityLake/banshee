@@ -17,16 +17,19 @@
 #ifndef __H_BANSHEE_KERNEL_SERIAL__
 #define __H_BANSHEE_KERNEL_SERIAL__
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#define SERIAL_PORT 0x3F8
+#define SERIAL_PORT1 0x3F8
+#define SERIAL_PORT2 0x2F8
 
-  int serial_init(void);
-  char serial_read(void);
-  void serial_write(char a);
+  int serial_init(uint16_t device);
+  unsigned char serial_read(uint16_t device);
+  void serial_write(uint16_t device, unsigned char data);
 
 #ifdef __cplusplus
 }
