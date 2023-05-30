@@ -8,12 +8,10 @@ kernel_main(void)
 {
   terminal_initialize();
 
-  terminal_writeerror("TEST ERROR\n");
-
-  puts("Initialize Serial I/O\n");
   if(serial_init() == 0)
   {
-    puts("Finished Intiializing Serial I/O\n");
+    puts("Attempint to intialize Serial I/O\n");
+    puts("Finished intializing Serial I/O\n");
 
     char message[] = "Hello Serial\n";
     size_t len = strlen(message);
@@ -25,6 +23,6 @@ kernel_main(void)
   }
   else
   {
-    terminal_writeerror("Failed To Initialize Serial I/O\n");
+    terminal_writeerror("Failed to initialize Serial I/O\n");
   }
 }

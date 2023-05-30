@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <kernel/serial.h>
 #include <kernel/tty.h>
 
 #include "vga.h"
@@ -44,6 +45,7 @@ terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y)
 {
   const size_t index = y * VGA_WIDTH + x;
   terminal_buffer[index] = vga_entry(c, color);
+  serial_write(c);
 }
 
 static void
@@ -72,6 +74,7 @@ terminal_putchar(char c)
   unsigned char uc = c;
   if(c == '\n')
   {
+    serial_write(c);
     terminal_column = 0;
     if(terminal_row + 1 == VGA_HEIGHT)
     {
@@ -87,6 +90,7 @@ terminal_putchar(char c)
     terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
     if(++terminal_column == VGA_WIDTH)
     {
+      serial_write('\n');
       terminal_column = 0;
       if(terminal_row + 1 == VGA_HEIGHT)
       {
