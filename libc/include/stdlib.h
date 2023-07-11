@@ -28,6 +28,10 @@ extern "C"
   char *utoa(unsigned int n, char *buffer, int radix);
   char *ftoa(float f, char *buffer, int after);
   char *dtoa(double d, char *buffer, int after);
+  char *ltoa(long n, char *buffer, int radix);
+  char *ultoa(unsigned long n, char *buffer, int radix);
+  char *lltoa(long long n, char *buffer, int radix);
+  char *ulltoa(unsigned long long n, char *buffer, int radix);
 
 #ifdef __cplusplus
 }

@@ -65,7 +65,11 @@ stdlib/abort.o \
 stdlib/itoa.o \
 stdlib/utoa.o \
 stdlib/ftoa.o \
-stdlib/dtoa.o
+stdlib/dtoa.o \
+stdlib/ltoa.o \
+stdlib/ultoa.o \
+stdlib/lltoa.o \
+stdlib/ulltoa.o
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \

@@ -89,10 +89,21 @@ printf(const char *format, ...)
       }
       else if(*c == 'u')
       {
-        unsigned int number = va_arg(argp, unsigned int);
-        char buffer[50];
-        utoa(number, buffer, 10);
-        puts(buffer);
+        if((*c + 1) == 'l')
+        {
+          if((*c + 2) == 'l')
+          {
+            ++c;
+          }
+          ++c;
+        }
+        else
+        {
+          unsigned int number = va_arg(argp, unsigned int);
+          char buffer[50];
+          utoa(number, buffer, 10);
+          puts(buffer);
+        }
       }
       else if(*c == 'x' || *c == 'X')
       {
@@ -125,6 +136,152 @@ printf(const char *format, ...)
         itoa(number, buffer, 8);
         puts(buffer);
       }
+      else if(*c == 'b')
+      {
+        int number = va_arg(argp, int);
+        char buffer[33];
+        for(int i = 0; i < 32; ++i)
+        {
+          if(number & 1)
+          {
+            buffer[i] = '1';
+          }
+          else
+          {
+            buffer[i] = '0';
+          }
+          number >>= 1;
+        }
+        buffer[32] = '\0';
+        puts(buffer);
+      }
+    }
+    else if(*c == 'l')
+    {
+      if(*c == 'l')
+      {
+        int radix;
+        if(*(c + 1) == 'd')
+        {
+          radix = 10;
+        }
+        else if(*(c + 1) == 'b')
+        {
+          radix = 2;
+        }
+        else if(*(c + 1) == 'o')
+        {
+          radix = 8;
+        }
+        else if(*(c + 1) == 'x')
+        {
+          radix = 16;
+        }
+        else if(*(c + 1) == 'X')
+        {
+          radix = 16;
+        }
+        else
+        {
+          putchar(*c);
+          ++c;
+          continue;
+        }
+
+        long long number = va_arg(argp, long long);
+        char buffer[70];
+
+        if(radix == 16)
+        {
+          ulltoa(number, buffer, radix);
+          if(*(c + 1) == 'X')
+          {
+            puts(buffer);
+          }
+          else
+          {
+            for(size_t i = 0; i < strlen(buffer); ++i)
+            {
+              if(buffer[i] > '9')
+              {
+                putchar('a' + (buffer[i] - 'A'));
+              }
+              else
+              {
+                putchar(buffer[i]);
+              }
+            }
+          }
+        }
+        else
+        {
+          lltoa(number, buffer, radix);
+          puts(buffer);
+        }
+        ++c;
+      }
+      else
+      {
+        int radix;
+        if(*(c + 1) == 'd')
+        {
+          radix = 10;
+        }
+        else if(*(c + 1) == 'b')
+        {
+          radix = 2;
+        }
+        else if(*(c + 1) == 'o')
+        {
+          radix = 8;
+        }
+        else if(*(c + 1) == 'x')
+        {
+          radix = 16;
+        }
+        else if(*(c + 1) == 'X')
+        {
+          radix = 16;
+        }
+        else
+        {
+          putchar(*c);
+          ++c;
+          continue;
+        }
+
+        long number = va_arg(argp, long);
+        char buffer[70];
+
+        if(radix == 16)
+        {
+          ultoa(number, buffer, radix);
+          if(*(c + 1) == 'X')
+          {
+            puts(buffer);
+          }
+          else
+          {
+            for(size_t i = 0; i < strlen(buffer); ++i)
+            {
+              if(buffer[i] > '9')
+              {
+                putchar('a' + (buffer[i] - 'A'));
+              }
+              else
+              {
+                putchar(buffer[i]);
+              }
+            }
+          }
+        }
+        else
+        {
+          ltoa(number, buffer, radix);
+          puts(buffer);
+        }
+      }
+      ++c;
     }
     else
     {
