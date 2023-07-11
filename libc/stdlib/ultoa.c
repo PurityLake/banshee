@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 char *
-ltoa(long n, char *buffer, int radix)
+ultoa(unsigned long n, char *buffer, int radix)
 {
   if(radix < 2)
   {
