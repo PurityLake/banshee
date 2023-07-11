@@ -26,3 +26,15 @@ export CC="$CC --sysroot=$SYSROOT"
 if echo "$HOST" | grep -Eq -- '-elf($|-)'; then
   export CC="$CC -isystem=$INCLUDEDIR"
 fi
+
+if [ ! -z $(which grub2-mkrescue)]; then
+	export MKRESCUE=grub2-mkrescue
+else
+	export MKRESCUE=grub-mkrescue
+fi
+
+if [ ! -z $(which grub2-file)]; then
+	export GRUBFILE=grub2-file
+else
+	export GRUBFILE=grub-file
+fi
