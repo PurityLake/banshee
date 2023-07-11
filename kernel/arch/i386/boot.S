@@ -28,7 +28,7 @@
 .long FLAGS
 .long CHECKSUM
 
-.section .rodata
+.section .data
 .align 4
 gdt:
 	.quad 0 # Null segment
