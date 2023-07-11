@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,8 +26,26 @@
 #error "libc is not ready yet"
 #endif
 
+#define MAX_BUFFER_SIZE 128
+
 // TODO: Add scientific notation
 // TODO: Add flags, width, length and precision
+
+// forward declarations
+static int print_ptr(uintptr_t ptr);
+static int print_int(int i, int radix);
+static int print_uint(unsigned int i, int radix);
+static int print_intbinary(unsigned int i);
+static int print_intoctal(unsigned int i);
+static int print_inthex(unsigned int i, int capital);
+static int print_float(float d);
+static int print_double(double d);
+static int print_long(long i, size_t radix);
+static int print_longhex(unsigned long l, int capital);
+static int print_ll(long long i, size_t radix);
+static int print_llhex(unsigned long long ll, int capital);
+static int print_ul(unsigned long i, size_t radix);
+static int print_ull(unsigned long long i, size_t radix);
 
 int
 printf(const char *format, ...)
@@ -50,238 +70,159 @@ printf(const char *format, ...)
       }
       else if(*c == 'c')
       {
-        char to_print = va_arg(argp, int);
-        putchar(to_print);
+        putchar((char)va_arg(argp, int));
       }
       else if(*c == 's')
       {
-        char *s = va_arg(argp, char *);
-        puts(s);
+        puts(va_arg(argp, const char *));
       }
       else if(*c == 'p')
       {
-        uintptr_t addr = va_arg(argp, uintptr_t);
-        if(sizeof(addr) > sizeof(int))
-        {
-          puts("\nNotSupported\n");
-        }
-        else
-        {
-          char buffer[50];
-          utoa(addr, buffer, 16);
-          puts("0x");
-          puts(buffer);
-        }
+        print_ptr(va_arg(argp, uintptr_t));
       }
       else if(*c == 'd' || *c == 'i')
       {
-        int number = va_arg(argp, double);
-        char buffer[50];
-        itoa(number, buffer, 10);
-        puts(buffer);
+        print_int(va_arg(argp, double), 10);
       }
       else if(*c == 'f')
       {
-        double number = va_arg(argp, double);
-        char buffer[50];
-        dtoa(number, buffer, 5);
-        puts(buffer);
+        print_float((float)va_arg(argp, double));
       }
       else if(*c == 'u')
       {
         if((*c + 1) == 'l')
         {
-          if((*c + 2) == 'l')
-          {
-            ++c;
-          }
           ++c;
+          if((*c + 1) == 'l')
+          {
+            print_ull(va_arg(argp, unsigned long long), 10);
+          }
+          else
+          {
+            print_ul(va_arg(argp, unsigned long), 10);
+          }
         }
         else
         {
-          unsigned int number = va_arg(argp, unsigned int);
-          char buffer[50];
-          utoa(number, buffer, 10);
-          puts(buffer);
+          print_uint(va_arg(argp, unsigned int), 10);
         }
       }
       else if(*c == 'x' || *c == 'X')
       {
-        unsigned int number = va_arg(argp, unsigned int);
-        char buffer[50];
-        utoa(number, buffer, 16);
-        if(*c == 'X')
-        {
-          puts(buffer);
-        }
-        else
-        {
-          for(size_t i = 0; i < strlen(buffer); ++i)
-          {
-            if(buffer[i] > '9')
-            {
-              putchar('a' + (buffer[i] - 'A'));
-            }
-            else
-            {
-              putchar(buffer[i]);
-            }
-          }
-        }
+        print_inthex(va_arg(argp, unsigned int), *c == 'X');
       }
       else if(*c == 'o')
       {
-        int number = va_arg(argp, int);
-        char buffer[50];
-        itoa(number, buffer, 8);
-        puts(buffer);
+        print_intoctal(va_arg(argp, unsigned int));
       }
       else if(*c == 'b')
       {
-        int number = va_arg(argp, int);
-        char buffer[33];
-        for(int i = 0; i < 32; ++i)
-        {
-          if(number & 1)
-          {
-            buffer[i] = '1';
-          }
-          else
-          {
-            buffer[i] = '0';
-          }
-          number >>= 1;
-        }
-        buffer[32] = '\0';
-        puts(buffer);
+        print_intbinary(va_arg(argp, unsigned int));
       }
-    }
-    else if(*c == 'l')
-    {
-      if(*c == 'l')
+      else if(*c == 'l')
       {
-        int radix;
-        if(*(c + 1) == 'd')
+        ++c;
+        if(*c == 'l')
         {
-          radix = 10;
-        }
-        else if(*(c + 1) == 'b')
-        {
-          radix = 2;
-        }
-        else if(*(c + 1) == 'o')
-        {
-          radix = 8;
-        }
-        else if(*(c + 1) == 'x')
-        {
-          radix = 16;
-        }
-        else if(*(c + 1) == 'X')
-        {
-          radix = 16;
-        }
-        else
-        {
-          putchar(*c);
           ++c;
-          continue;
-        }
-
-        long long number = va_arg(argp, long long);
-        char buffer[70];
-
-        if(radix == 16)
-        {
-          ulltoa(number, buffer, radix);
-          if(*(c + 1) == 'X')
+          if(*c == 'f')
           {
-            puts(buffer);
+            print_double(va_arg(argp, double));
+            ++c;
+            continue;
+          }
+
+          int cont = 0;
+          int radix;
+          if(*c == 'd')
+          {
+            radix = 10;
+          }
+          else if(*c == 'b')
+          {
+            radix = 2;
+          }
+          else if(*c == 'o')
+          {
+            radix = 8;
+          }
+          else if(*c == 'x')
+          {
+            radix = 16;
+          }
+          else if(*c == 'X')
+          {
+            radix = 16;
           }
           else
           {
-            for(size_t i = 0; i < strlen(buffer); ++i)
-            {
-              if(buffer[i] > '9')
-              {
-                putchar('a' + (buffer[i] - 'A'));
-              }
-              else
-              {
-                putchar(buffer[i]);
-              }
-            }
+            cont = 1;
+            radix = 10;
+          }
+
+          if(radix == 16)
+          {
+            print_llhex(va_arg(argp, unsigned long long), *c == 'X');
+          }
+          else
+          {
+            print_ll(va_arg(argp, long long), radix);
+          }
+
+          if(cont)
+          {
+            continue;
           }
         }
         else
         {
-          lltoa(number, buffer, radix);
-          puts(buffer);
+          int cont = 0;
+          int radix;
+          if(*c == 'd')
+          {
+            radix = 10;
+          }
+          else if(*c == 'b')
+          {
+            radix = 2;
+          }
+          else if(*c == 'o')
+          {
+            radix = 8;
+          }
+          else if(*c == 'x')
+          {
+            radix = 16;
+          }
+          else if(*c == 'X')
+          {
+            radix = 16;
+          }
+          else
+          {
+            cont = 1;
+            radix = 10;
+          }
+
+          if(radix == 16)
+          {
+            print_longhex(va_arg(argp, unsigned long), *c == 'X');
+          }
+          else
+          {
+            print_long(va_arg(argp, long), radix);
+          }
+
+          if(cont)
+          {
+            continue;
+          }
         }
-        ++c;
       }
       else
       {
-        int radix;
-        if(*(c + 1) == 'd')
-        {
-          radix = 10;
-        }
-        else if(*(c + 1) == 'b')
-        {
-          radix = 2;
-        }
-        else if(*(c + 1) == 'o')
-        {
-          radix = 8;
-        }
-        else if(*(c + 1) == 'x')
-        {
-          radix = 16;
-        }
-        else if(*(c + 1) == 'X')
-        {
-          radix = 16;
-        }
-        else
-        {
-          putchar(*c);
-          ++c;
-          continue;
-        }
-
-        long number = va_arg(argp, long);
-        char buffer[70];
-
-        if(radix == 16)
-        {
-          ultoa(number, buffer, radix);
-          if(*(c + 1) == 'X')
-          {
-            puts(buffer);
-          }
-          else
-          {
-            for(size_t i = 0; i < strlen(buffer); ++i)
-            {
-              if(buffer[i] > '9')
-              {
-                putchar('a' + (buffer[i] - 'A'));
-              }
-              else
-              {
-                putchar(buffer[i]);
-              }
-            }
-          }
-        }
-        else
-        {
-          ltoa(number, buffer, radix);
-          puts(buffer);
-        }
+        putchar(*c);
       }
-      ++c;
     }
     else
     {
@@ -290,4 +231,182 @@ printf(const char *format, ...)
     ++c;
   }
   return 1;
+}
+
+static int
+print_ptr(uintptr_t ptr)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ulltoa(ptr, buffer, 16);
+  puts("0x");
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_int(int i, int radix)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  itoa(i, buffer, radix);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_uint(unsigned int i, int radix)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  utoa(i, buffer, radix);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_intbinary(unsigned int i)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  utoa(i, buffer, 2);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_intoctal(unsigned int i)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  utoa(i, buffer, 8);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_inthex(unsigned int i, int capital)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  utoa(i, buffer, 16);
+  if(!capital)
+  {
+    for(size_t i = 0; i < strlen(buffer); ++i)
+    {
+      if(buffer[i] > '9')
+      {
+        putchar('a' + (buffer[i] - 'A'));
+      }
+      else
+      {
+        putchar(buffer[i]);
+      }
+    }
+  }
+  else
+  {
+    puts(buffer);
+  }
+  return strlen(buffer);
+}
+
+static int
+print_float(float f)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ftoa(f, buffer, 10);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_double(double d)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  dtoa(d, buffer, 10);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_long(long i, size_t radix)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ltoa(i, buffer, radix);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_longhex(unsigned long l, int capital)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ultoa(l, buffer, 16);
+  if(!capital)
+  {
+    for(size_t i = 0; i < strlen(buffer); ++i)
+    {
+      if(buffer[i] > '9')
+      {
+        putchar('a' + (buffer[i] - 'A'));
+      }
+      else
+      {
+        putchar(buffer[i]);
+      }
+    }
+  }
+  else
+  {
+    puts(buffer);
+  }
+  return strlen(buffer);
+}
+
+static int
+print_ll(long long i, size_t radix)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ltoa(i, buffer, radix);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_llhex(unsigned long long ll, int capital)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ulltoa(ll, buffer, 16);
+  if(!capital)
+  {
+    for(size_t i = 0; i < strlen(buffer); ++i)
+    {
+      if(buffer[i] > '9')
+      {
+        putchar('a' + (buffer[i] - 'A'));
+      }
+      else
+      {
+        putchar(buffer[i]);
+      }
+    }
+  }
+  else
+  {
+    puts(buffer);
+  }
+  return strlen(buffer);
+}
+
+static int
+print_ul(unsigned long i, size_t radix)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ultoa(i, buffer, radix);
+  puts(buffer);
+  return strlen(buffer);
+}
+
+static int
+print_ull(unsigned long long i, size_t radix)
+{
+  char buffer[MAX_BUFFER_SIZE];
+  ulltoa(i, buffer, radix);
+  puts(buffer);
+  return strlen(buffer);
 }
