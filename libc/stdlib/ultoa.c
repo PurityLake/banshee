@@ -13,9 +13,6 @@ ltoa(long n, char *buffer, int radix)
   }
 
   char reverse[70];
-  int sign = (n < 0) ? -1 : 0;
-
-  n = (n < 0) ? -n : n;
 
   int i;
   for(i = 0; i < 70; ++i)
