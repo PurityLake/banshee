@@ -14,10 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <kernel/serial.h>
-#include <kernel/tty.h>
-#include <stdio.h>
-#include <string.h>
+#ifndef __H_BANSHEE_KERNEL_GDT__
+#define __H_BANSHEE_KERNEL_GDT__
+
+#include <stdint.h>
 
 // Each define here is for a specific flag in the descriptor.
 // Refer to the intel documentation for a description of what each one does.
@@ -64,81 +64,35 @@
   SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | SEG_LONG(0) | SEG_SIZE(1)     \
       | SEG_GRAN(1) | SEG_PRIV(3) | SEG_DATA_RDWR
 
-struct gdtr
+#ifdef __cplusplus
+extern "C"
 {
-  uint16_t limit;
-  uint32_t base;
-} __attribute__((packed));
+#endif
 
-struct gdtr_desc
-{
-  uint16_t limit_low;
-  uint16_t base_low;
-  uint8_t base_middle;
-  uint8_t limit_high;
-  uint8_t access;
-  uint8_t other;
-  uint8_t base_high;
-} __attribute__((packed));
+  struct gdtr
+  {
+    uint16_t limit;
+    uint32_t base;
+  } __attribute__((packed));
 
-typedef struct gdtr gdtr_t;
-typedef struct gdtr_desc gdtr_desc_t;
+  struct gdtr_desc
+  {
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t base_middle;
+    uint8_t limit_high;
+    uint8_t access;
+    uint8_t flags;
+    uint8_t base_high;
+  } __attribute__((packed));
 
-uint64_t
-create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
-{
-  uint64_t descriptor;
+  typedef struct gdtr gdtr_t;
+  typedef struct gdtr_desc gdtr_desc_t;
 
-  // Create the high 32 bit segment
-  descriptor = limit & 0x000F0000; // set limit bits 19:16
-  descriptor |= (flag << 8)
-                & 0x00F0FF00; // set type, p, dpl, s, g, d/b, l and avl fields
-  descriptor |= (base >> 16) & 0x000000FF; // set base bits 23:16
-  descriptor |= base & 0xFF000000;         // set base bits 31:24
+  void init_gdt(void);
 
-  // Shift by 32 to allow for low part of segment
-  descriptor <<= 32;
-
-  // Create the low 32 bit segment
-  descriptor |= base << 16;         // set base bits 15:0
-  descriptor |= limit & 0x0000FFFF; // set limit bits 15:0
-
-  return descriptor;
+#ifdef __cplusplus
 }
+#endif
 
-void
-kernel_main(void)
-{
-  terminal_initialize();
-  init_gdt();
-
-  if(serial_init(SERIAL_PORT1) == 0)
-  {
-    puts("Attempint to intialize Serial I/O\n");
-    puts("Finished intializing Serial I/O\n");
-
-    printf("A: %llx \n", create_descriptor(0, 0, 0));
-    printf("B: %llx \n", create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0)));
-    printf("C: %llx \n", create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0)));
-    printf("D: %llx \n", create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3)));
-    printf("E: %llx \n", create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3)));
-
-    char message[] = "Hello Serial\n";
-
-    size_t len = strlen(message);
-
-    for(size_t i = 0; i < len; ++i)
-    {
-      serial_write(SERIAL_PORT1, message[i]);
-    }
-  }
-  else
-  {
-    terminal_writeerror("Failed to initialize Serial I/O\n");
-  }
-
-  for(;;)
-  {
-    __asm__ volatile("hlt");
-  }
-}
+#endif /* __H_BANSHEE_KERNEL_PORT__ */
