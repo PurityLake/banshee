@@ -14,39 +14,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <kernel/gdt.h>
-#include <kernel/io.h>
-#include <kernel/serial.h>
-#include <kernel/tty.h>
-#include <string.h>
+#ifndef __H_BANSHEE_KERNEL_PORT__
+#define __H_BANSHEE_KERNEL_PORT__
 
-void
-kernel_main(void)
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C"
 {
-  terminal_initialize();
-  init_gdt();
+#endif
 
-  if(serial_init(SERIAL_PORT1) == 0)
-  {
-    kputs("Attempint to intialize Serial I/O\n");
-    kputs("Finished intializing Serial I/O\n");
+    int kputchar(char c);
+    int kputs(const char *str);
+    int kprintf(const char *format, ...);
 
-    char message[] = "Hello Serial\n";
-
-    size_t len = strlen(message);
-
-    for(size_t i = 0; i < len; ++i)
-    {
-      serial_write(SERIAL_PORT1, message[i]);
-    }
-  }
-  else
-  {
-    terminal_writeerror("Failed to initialize Serial I/O\n");
-  }
-
-  for(;;)
-  {
-    __asm__ volatile("hlt");
-  }
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* __H_BANSHEE_KERNEL_PORT__ */
