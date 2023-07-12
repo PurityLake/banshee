@@ -54,6 +54,7 @@ printf(const char *format, ...)
   va_start(argp, format);
 
   const char *c = format;
+  unsigned int chars_printed = 0;
 
   while(*c != '\0')
   {
@@ -62,7 +63,7 @@ printf(const char *format, ...)
       ++c;
       if(*c == '%')
       {
-        putchar('%');
+        chars_printed += putchar('%');
       }
       else if(*c == 'n')
       {
@@ -70,23 +71,23 @@ printf(const char *format, ...)
       }
       else if(*c == 'c')
       {
-        putchar((char)va_arg(argp, int));
+        chars_printed += putchar((char)va_arg(argp, int));
       }
       else if(*c == 's')
       {
-        puts(va_arg(argp, const char *));
+        chars_printed += puts(va_arg(argp, const char *));
       }
       else if(*c == 'p')
       {
-        print_ptr(va_arg(argp, uintptr_t));
+        chars_printed += print_ptr(va_arg(argp, uintptr_t));
       }
       else if(*c == 'd' || *c == 'i')
       {
-        print_int(va_arg(argp, double), 10);
+        chars_printed += print_int(va_arg(argp, double), 10);
       }
       else if(*c == 'f')
       {
-        print_float((float)va_arg(argp, double));
+        chars_printed += print_float((float)va_arg(argp, double));
       }
       else if(*c == 'u')
       {
@@ -95,29 +96,29 @@ printf(const char *format, ...)
           ++c;
           if((*c + 1) == 'l')
           {
-            print_ull(va_arg(argp, unsigned long long), 10);
+            chars_printed += print_ull(va_arg(argp, unsigned long long), 10);
           }
           else
           {
-            print_ul(va_arg(argp, unsigned long), 10);
+            chars_printed += print_ul(va_arg(argp, unsigned long), 10);
           }
         }
         else
         {
-          print_uint(va_arg(argp, unsigned int), 10);
+          chars_printed += print_uint(va_arg(argp, unsigned int), 10);
         }
       }
       else if(*c == 'x' || *c == 'X')
       {
-        print_inthex(va_arg(argp, unsigned int), *c == 'X');
+        chars_printed += print_inthex(va_arg(argp, unsigned int), *c == 'X');
       }
       else if(*c == 'o')
       {
-        print_intoctal(va_arg(argp, unsigned int));
+        chars_printed += print_intoctal(va_arg(argp, unsigned int));
       }
       else if(*c == 'b')
       {
-        print_intbinary(va_arg(argp, unsigned int));
+        chars_printed += print_intbinary(va_arg(argp, unsigned int));
       }
       else if(*c == 'l')
       {
@@ -127,7 +128,7 @@ printf(const char *format, ...)
           ++c;
           if(*c == 'f')
           {
-            print_double(va_arg(argp, double));
+            chars_printed += print_double(va_arg(argp, double));
             ++c;
             continue;
           }
@@ -162,11 +163,12 @@ printf(const char *format, ...)
 
           if(radix == 16)
           {
-            print_llhex(va_arg(argp, unsigned long long), *c == 'X');
+            chars_printed
+                += print_llhex(va_arg(argp, unsigned long long), *c == 'X');
           }
           else
           {
-            print_ll(va_arg(argp, long long), radix);
+            chars_printed += print_ll(va_arg(argp, long long), radix);
           }
 
           if(cont)
@@ -206,11 +208,12 @@ printf(const char *format, ...)
 
           if(radix == 16)
           {
-            print_longhex(va_arg(argp, unsigned long), *c == 'X');
+            chars_printed
+                += print_longhex(va_arg(argp, unsigned long), *c == 'X');
           }
           else
           {
-            print_long(va_arg(argp, long), radix);
+            chars_printed += print_long(va_arg(argp, long), radix);
           }
 
           if(cont)
@@ -221,16 +224,16 @@ printf(const char *format, ...)
       }
       else
       {
-        putchar(*c);
+        chars_printed += putchar(*c);
       }
     }
     else
     {
-      putchar(*c);
+      chars_printed += putchar(*c);
     }
     ++c;
   }
-  return 1;
+  return chars_printed;
 }
 
 static int
@@ -239,8 +242,7 @@ print_ptr(uintptr_t ptr)
   char buffer[MAX_BUFFER_SIZE];
   ulltoa(ptr, buffer, 16);
   puts("0x");
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer) + 2;
 }
 
 static int
@@ -248,8 +250,7 @@ print_int(int i, int radix)
 {
   char buffer[MAX_BUFFER_SIZE];
   itoa(i, buffer, radix);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -257,8 +258,7 @@ print_uint(unsigned int i, int radix)
 {
   char buffer[MAX_BUFFER_SIZE];
   utoa(i, buffer, radix);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -266,8 +266,7 @@ print_intbinary(unsigned int i)
 {
   char buffer[MAX_BUFFER_SIZE];
   utoa(i, buffer, 2);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -275,8 +274,7 @@ print_intoctal(unsigned int i)
 {
   char buffer[MAX_BUFFER_SIZE];
   utoa(i, buffer, 8);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -300,7 +298,7 @@ print_inthex(unsigned int i, int capital)
   }
   else
   {
-    puts(buffer);
+    return puts(buffer);
   }
   return strlen(buffer);
 }
@@ -310,8 +308,7 @@ print_float(float f)
 {
   char buffer[MAX_BUFFER_SIZE];
   ftoa(f, buffer, 10);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -319,8 +316,7 @@ print_double(double d)
 {
   char buffer[MAX_BUFFER_SIZE];
   dtoa(d, buffer, 10);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -328,8 +324,7 @@ print_long(long i, size_t radix)
 {
   char buffer[MAX_BUFFER_SIZE];
   ltoa(i, buffer, radix);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -353,7 +348,7 @@ print_longhex(unsigned long l, int capital)
   }
   else
   {
-    puts(buffer);
+    return puts(buffer);
   }
   return strlen(buffer);
 }
@@ -363,8 +358,7 @@ print_ll(long long i, size_t radix)
 {
   char buffer[MAX_BUFFER_SIZE];
   ltoa(i, buffer, radix);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -388,7 +382,7 @@ print_llhex(unsigned long long ll, int capital)
   }
   else
   {
-    puts(buffer);
+    return puts(buffer);
   }
   return strlen(buffer);
 }
@@ -398,8 +392,7 @@ print_ul(unsigned long i, size_t radix)
 {
   char buffer[MAX_BUFFER_SIZE];
   ultoa(i, buffer, radix);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
 
 static int
@@ -407,6 +400,5 @@ print_ull(unsigned long long i, size_t radix)
 {
   char buffer[MAX_BUFFER_SIZE];
   ulltoa(i, buffer, radix);
-  puts(buffer);
-  return strlen(buffer);
+  return puts(buffer);
 }
