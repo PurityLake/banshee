@@ -27,13 +27,13 @@ if echo "$HOST" | grep -Eq -- '-elf($|-)'; then
   export CC="$CC -isystem=$INCLUDEDIR"
 fi
 
-if [ ! -z $(which grub2-mkrescue)]; then
+if [ command -v grub2-mkrescue > /dev/null 2&>1]; then
 	export MKRESCUE=grub2-mkrescue
 else
 	export MKRESCUE=grub-mkrescue
 fi
 
-if [ ! -z $(which grub2-file)]; then
+if [ command -v grub2-file > /dev/null 2&>1]; then
 	export GRUBFILE=grub2-file
 else
 	export GRUBFILE=grub-file
