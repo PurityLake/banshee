@@ -1,0 +1,4 @@
+-D__is_libk
+-I./libc/include/
+-I./kernel/include/
+
